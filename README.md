@@ -120,7 +120,7 @@ uv tool upgrade revenant-rgb      # update to the latest release
 uv tool uninstall revenant-rgb    # uninstall
 ```
 
-A specific version is chosen by appending `@<tag>` to the repository URL, e.g. `…/revenant-rgb@v0.1.0`.
+A specific version is chosen by appending `@<tag>` to the repository URL, e.g. `…/revenant-rgb@v0.1.1`.
 `revenant --version` shows the installed version.
 
 Debian/Ubuntu: if the automatic install fails, the `python3-venv` package is missing (`sudo apt install python3-venv`).

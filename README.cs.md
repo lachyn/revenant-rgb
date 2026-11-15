@@ -119,7 +119,7 @@ uv tool upgrade revenant-rgb      # aktualizace na nejnovější vydání
 uv tool uninstall revenant-rgb    # odinstalace
 ```
 
-Konkrétní verzi jde zvolit přidáním `@<tag>` za adresu repozitáře, např. `…/revenant-rgb@v0.1.0`.
+Konkrétní verzi jde zvolit přidáním `@<tag>` za adresu repozitáře, např. `…/revenant-rgb@v0.1.1`.
 Nainstalovanou verzi ukáže `revenant --version`.
 
 Debian/Ubuntu: pokud automatická instalace selže, chybí balíček `python3-venv` (`sudo apt install python3-venv`).
