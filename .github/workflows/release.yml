@@ -1,0 +1,58 @@
+name: release
+
+# A published GitHub Release (tools/push_public.sh --release vX.Y.Z) builds the package, runs the tests,
+# uploads it to PyPI through Trusted Publishing (no token, with provenance attestations)
+# and attaches the same files to the release.
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: version matches the tag
+        run: |
+          version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' revenant.py)
+          [ "v$version" = "$GITHUB_REF_NAME" ] || { echo "revenant.py says $version, tag is $GITHUB_REF_NAME"; exit 1; }
+      - run: uv build
+      - run: uvx twine check --strict dist/*
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  pypi:
+    needs: [tests, build]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/revenant-rgb/
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+
+  release-assets:
+    needs: pypi
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - run: gh release upload "$GITHUB_REF_NAME" dist/* --clobber --repo "$GITHUB_REPOSITORY"
+        env:
+          GH_TOKEN: ${{ github.token }}
