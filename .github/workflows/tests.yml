@@ -14,14 +14,14 @@ jobs:
         python: ["3.9", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
       - name: pytest
         run: uv run --python ${{ matrix.python }} --group dev pytest -q
 
   web-types:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: type-check the web UI
         run: npx -y -p typescript@5.6.3 tsc -p revenant_web
