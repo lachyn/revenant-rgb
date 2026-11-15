@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
+  <title>Revenant</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='8' width='28' height='16' rx='4' fill='%2322d3ee'/%3E%3Crect x='6' y='12' width='4' height='3' rx='1' fill='%230b0e14'/%3E%3Crect x='12' y='12' width='4' height='3' rx='1' fill='%230b0e14'/%3E%3Crect x='18' y='12' width='4' height='3' rx='1' fill='%230b0e14'/%3E%3Crect x='9' y='17' width='14' height='3' rx='1' fill='%230b0e14'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<!--
+  Two concepts, two areas: the sidebar holds the profiles (saved snapshots), the main area edits the current
+  settings (what is on the keyboard; every change is sent right away). Texts are English; elements marked data-i18n
+  (and data-i18n-placeholder / data-i18n-title) are translated by app.js. After changing a text: python tools/i18n_check.py
+-->
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <h1>Revenant</h1>
+      <span class="muted" id="version"></span>
+    </div>
+    <span class="spacer"></span>
+    <span class="badge" id="device" data-i18n-title="Keyboard status"><span class="dot"></span><span id="device-text"></span></span>
+    <label class="lang-pick"><span class="label" data-i18n>Language</span> <select class="lang" id="lang"></select></label>
+  </header>
+
+  <div class="layout">
+    <!-- ======================================== profiles -->
+    <aside class="sidebar" aria-labelledby="profiles-title">
+      <section class="card">
+        <div class="card-head">
+          <span class="label" data-i18n>Active profile</span>
+          <span class="spacer"></span>
+          <span class="badge" id="state"></span>
+        </div>
+        <div class="current-name" id="active-name"></div>
+        <div class="current-actions">
+          <button class="btn outline" id="save-profile" data-i18n-title="Save the current settings to the active profile" data-i18n>Save</button>
+          <button class="btn outline" id="discard" data-i18n-title="Go back to the saved profile" data-i18n>Discard changes</button>
+        </div>
+        <button class="btn outline full" id="apply-all" data-i18n-title="Send the current settings to the keyboard again, e.g. after a factory reset" data-i18n>Re-send to keyboard</button>
+      </section>
+
+      <section class="card">
+        <h2 id="profiles-title" data-i18n>Profiles</h2>
+        <ul class="profile-list" id="pf-list"></ul>
+        <div class="new-profile">
+          <input id="pf-name" data-i18n-placeholder="name of a new profile" autocomplete="off" spellcheck="false">
+          <div class="current-actions">
+            <button class="btn outline sm" id="pf-copy" data-i18n-title="Save the current settings under a new name" data-i18n>Save as new</button>
+            <button class="btn ghost sm" id="pf-new" data-i18n-title="Create an empty profile" data-i18n>New empty</button>
+          </div>
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- ======================================== editor of the current settings -->
+    <main class="editor">
+      <div class="banner" id="banner" role="alert" hidden>
+        <div>
+          <strong id="banner-title"></strong>
+          <p id="banner-text"></p>
+        </div>
+        <button class="btn primary" id="banner-btn" hidden></button>
+      </div>
+
+      <nav class="segmented" role="tablist" aria-label="Editor">
+        <button role="tab" data-tab="lighting" aria-selected="true" data-i18n>Lighting</button>
+        <button role="tab" data-tab="remap" data-i18n>Key functions</button>
+        <button role="tab" data-tab="macros" data-i18n>Macros</button>
+        <button role="tab" data-tab="game" data-i18n>Game mode</button>
+      </nav>
+
+      <!-- ---------------------------------------- lighting: custom colours or a hardware effect -->
+      <section class="panel" id="tab-lighting" role="tabpanel">
+        <div class="panel-head">
+          <div class="segmented sm" role="tablist" id="light-mode">
+            <button role="tab" data-mode="keys" aria-selected="true" data-i18n>Custom colours</button>
+            <button role="tab" data-mode="effect" data-i18n>Effect</button>
+          </div>
+          <span class="mode-note" id="mode-note"></span>
+        </div>
+
+        <div id="mode-keys" class="panel">
+          <div class="kbd-wrap"><div class="kbd" id="kbd"></div></div>
+          <div class="card tools">
+            <div class="row">
+              <div class="current" id="current" data-i18n-title="Current colour"></div>
+              <div class="palette" id="palette"></div>
+              <label class="color-pick" id="custom-pick" data-i18n-title="Custom colour">
+                <input type="color" id="color-input" value="#ff0000">
+                <span data-i18n>Custom</span>
+              </label>
+            </div>
+            <div class="row">
+              <span class="label" data-i18n>Select</span>
+              <div class="row" id="groups"></div>
+              <span class="spacer"></span>
+              <span class="muted" id="sel-count"></span>
+            </div>
+            <div class="row">
+              <button class="btn primary" id="paint" data-i18n>Paint selection</button>
+              <button class="btn outline" id="pick" aria-pressed="false" data-i18n>Eyedropper</button>
+              <button class="btn outline" id="blank" data-i18n>Turn selection off</button>
+              <span class="spacer"></span>
+              <label class="slider"><span class="label" data-i18n>Brightness</span> <input type="range" min="0" max="16" id="key-bright"><output id="key-bright-out"></output></label>
+              <button class="btn danger" id="clear-all" data-i18n>Turn all off</button>
+            </div>
+            <p class="muted"><span data-i18n>Click keys or a group, then a colour. Shift+click adds a range within the row;</span>
+              <kbd>Esc</kbd> <span data-i18n>clears the selection.</span></p>
+          </div>
+        </div>
+
+        <div id="mode-effect" class="card form" hidden>
+          <label class="field"><span class="label" data-i18n>Effect</span> <select id="fx-effect"></select></label>
+          <div class="row">
+            <label class="switch"><input type="checkbox" id="fx-rainbow"><span class="track"></span><span data-i18n>Rainbow</span></label>
+            <label class="color-pick" data-i18n-title="Effect colour"><input type="color" id="fx-color"><span data-i18n>Colour</span></label>
+          </div>
+          <label class="slider"><span class="label" data-i18n>Brightness</span> <input type="range" min="0" max="16" id="fx-bright"><output id="fx-bright-out"></output></label>
+          <label class="slider"><span class="label" data-i18n>Speed</span> <input type="range" min="0" max="16" id="fx-speed"><output id="fx-speed-out"></output></label>
+          <div class="field">
+            <span class="label" data-i18n>Direction</span>
+            <div class="segmented sm" role="radiogroup" id="fx-dir">
+              <button type="button" data-dir="right">→ <span data-i18n>right</span></button>
+              <button type="button" data-dir="left">← <span data-i18n>left</span></button>
+              <button type="button" data-dir="up">↑ <span data-i18n>up</span></button>
+              <button type="button" data-dir="down">↓ <span data-i18n>down</span></button>
+            </div>
+          </div>
+          <div class="row"><button class="btn primary" id="fx-apply" data-i18n>Run effect</button></div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------- key functions -->
+      <section class="panel" id="tab-remap" role="tabpanel" hidden>
+        <p class="muted" data-i18n>Click a key on the keyboard, then choose what it should do. Keys with their own function have a dot.</p>
+        <div class="kbd-wrap"><div class="kbd" id="kbd-remap"></div></div>
+        <div class="card">
+          <div class="fields">
+            <label class="field"><span class="label" data-i18n>Key</span> <select id="rm-key"></select></label>
+            <label class="field"><span class="label" data-i18n>Function</span> <select id="rm-type"></select></label>
+            <label class="field"><span class="label" data-i18n>Parameter</span> <input id="rm-arg" autocomplete="off" spellcheck="false"></label>
+          </div>
+          <div class="fields" id="rm-macro-row">
+            <label class="field"><span class="label" data-i18n>Macro mode</span> <select id="rm-mode"></select></label>
+            <label class="field"><span class="label" data-i18n>Repeat count</span> <input id="rm-count" type="number" min="1" max="255" value="5"></label>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="rm-set" data-i18n>Assign</button>
+            <button class="btn outline" id="rm-reset" data-i18n>Reset key</button>
+            <span class="spacer"></span>
+            <button class="btn danger" id="rm-clear" data-i18n>All to default</button>
+          </div>
+        </div>
+        <div class="card">
+          <table class="table" id="rm-table">
+            <thead><tr><th data-i18n>Key</th><th data-i18n>Function</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <p class="empty" id="rm-empty" data-i18n>All keys have their default function.</p>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------- macros -->
+      <section class="panel" id="tab-macros" role="tabpanel" hidden>
+        <div class="split">
+          <div class="card">
+            <div class="row"><input id="mc-name" data-i18n-placeholder="name of the new macro" autocomplete="off" spellcheck="false">
+              <button class="btn outline" id="mc-new" data-i18n>New</button></div>
+            <ul class="list" id="mc-list"></ul>
+            <p class="empty" id="mc-empty" data-i18n>No macros yet.</p>
+          </div>
+          <div class="card">
+            <label class="field"><span class="label"><span data-i18n>Macro steps – one per line</span> <span id="mc-current"></span></span>
+              <textarea id="mc-edit" rows="12" spellcheck="false"></textarea></label>
+            <div class="row">
+              <button class="btn primary" id="mc-save" data-i18n>Save macro</button>
+              <span class="spacer"></span>
+              <button class="btn danger" id="mc-del" data-i18n>Delete macro</button>
+            </div>
+            <dl class="help">
+              <dt><code>a</code> <code>enter</code> <code>f5</code></dt><dd data-i18n>press and release a key</dd>
+              <dt><code>text:Hello!</code></dt><dd data-i18n>type text (US layout)</dd>
+              <dt><code>combo:ctrl+c</code></dt><dd data-i18n>key combination</dd>
+              <dt><code>down:shift</code> <code>up:shift</code></dt><dd data-i18n>press only / release only</dd>
+              <dt><code>100ms</code></dt><dd data-i18n>pause</dd>
+              <dt><code>mouse:left</code></dt><dd data-i18n>mouse click</dd>
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      <!-- ---------------------------------------- game mode -->
+      <section class="panel" id="tab-game" role="tabpanel" hidden>
+        <div class="card form">
+          <label class="switch"><input type="checkbox" id="gm-enabled"><span class="track"></span><strong data-i18n>Game mode enabled</strong></label>
+          <p class="muted" data-i18n>When enabled, block:</p>
+          <label class="check"><input type="checkbox" id="gm-alt_tab"> Alt + Tab</label>
+          <label class="check"><input type="checkbox" id="gm-alt_f4"> Alt + F4</label>
+          <label class="check"><input type="checkbox" id="gm-win"> <span data-i18n>Windows key</span></label>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- in-app confirmation (instead of the browser's confirm()) -->
+  <dialog class="dialog" id="dlg" aria-labelledby="dlg-title">
+    <form method="dialog" class="dialog-body">
+      <h3 id="dlg-title"></h3>
+      <p class="muted" id="dlg-text"></p>
+      <div class="row dialog-actions">
+        <button class="btn outline" value="cancel" id="dlg-cancel"></button>
+        <button class="btn primary" value="ok" id="dlg-ok"></button>
+      </div>
+    </form>
+  </dialog>
+</body>
+</html>

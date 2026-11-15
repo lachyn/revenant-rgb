@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# raw logs from reverse engineering (large / machine specific)
+research/hidlog.txt
+research/*.log
+research/sniff_console.txt
+research/listen_log.txt
+research/uninstall_log.txt
+research/cmd.txt
+research/ack.txt
+research/uninstall_vendor.ps1
+listen_log.txt
+dist/

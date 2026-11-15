@@ -1,0 +1,47 @@
+{
+  "lighting": {
+    "mode": "keys",
+    "effect": "static",
+    "color": "00aaff",
+    "rainbow": false,
+    "brightness": 16,
+    "speed": 10,
+    "direction": "right",
+    "keys": {
+      "w": "ff0020",
+      "a": "ff0020",
+      "s": "ff0020",
+      "d": "ff0020",
+      "lshift": "ff7000",
+      "lctrl": "ff7000",
+      "space": "ff7000",
+      "q": "00c8ff",
+      "e": "00c8ff",
+      "r": "00c8ff",
+      "f": "00c8ff",
+      "g": "00c8ff",
+      "c": "00c8ff",
+      "1": "ffd000",
+      "2": "ffd000",
+      "3": "ffd000",
+      "4": "ffd000",
+      "5": "ffd000",
+      "tab": "ffffff",
+      "esc": "ffffff",
+      "f1": "a050ff",
+      "f2": "a050ff",
+      "f3": "a050ff",
+      "f4": "a050ff"
+    },
+    "base": "0a0a14",
+    "key_brightness": 16
+  },
+  "remap": {},
+  "macros": {},
+  "gamemode": {
+    "enabled": true,
+    "alt_tab": false,
+    "alt_f4": false,
+    "win": true
+  }
+}

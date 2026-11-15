@@ -1,0 +1,4 @@
+# keep LF line endings in the repository, also when edited on Windows
+* text=auto eol=lf
+*.bin binary
+*.png binary

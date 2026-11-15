@@ -1,0 +1,45 @@
+[project]
+name = "revenant-rgb"
+dynamic = ["version"]
+description = "Unofficial cross-platform driver for the CZC.Gaming Revenant keyboard: RGB lighting, key remapping, macros and profiles - CLI, TUI and web UI"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.9"
+dependencies = ["hidapi>=0.14", "textual>=0.80", "psutil>=5.9"]
+keywords = ["keyboard", "rgb", "hid", "czc", "revenant", "sonix", "tui"]
+classifiers = [
+    "Environment :: Console",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Topic :: System :: Hardware :: Hardware Drivers",
+]
+
+[project.urls]
+Homepage = "https://github.com/lachyn/revenant-rgb"
+Issues = "https://github.com/lachyn/revenant-rgb/issues"
+
+[project.scripts]
+revenant-rgb = "revenant:cli"
+revenant = "revenant:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "revenant.py"
+
+[tool.hatch.build.targets.wheel]
+only-include = ["revenant.py", "revenant_web/index.html", "revenant_web/style.css", "revenant_web/app.js", "revenant_i18n/cs.json", "revenant_profiles"]
+
+[tool.hatch.build.targets.sdist]
+include = ["revenant.py", "revenant_web/", "revenant_i18n/", "revenant_profiles/", "tools/i18n_check.py", "README.md", "README.cs.md", "tests/", "LICENSE", "requirements.txt"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

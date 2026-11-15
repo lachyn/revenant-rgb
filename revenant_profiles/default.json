@@ -1,0 +1,22 @@
+{
+  "lighting": {
+    "mode": "effect",
+    "effect": "static",
+    "color": "00aaff",
+    "rainbow": false,
+    "brightness": 16,
+    "speed": 10,
+    "direction": "right",
+    "keys": {},
+    "base": "000000",
+    "key_brightness": 16
+  },
+  "remap": {},
+  "macros": {},
+  "gamemode": {
+    "enabled": false,
+    "alt_tab": false,
+    "alt_f4": false,
+    "win": false
+  }
+}
