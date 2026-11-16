@@ -1305,6 +1305,7 @@ def run_tui():
     try:
         from textual import events, on, work
         from textual.app import App, ComposeResult
+        from textual.binding import Binding
         from textual.color import Color
         from textual.containers import Horizontal, HorizontalScroll, Vertical, VerticalScroll
         from textual.widgets import (Button, Checkbox, DataTable, Footer, Header, Input, Label, OptionList,
@@ -1558,7 +1559,9 @@ def run_tui():
         BINDINGS = [("ctrl+s", "save_profile", tr("Save")), ("ctrl+a", "select_all", tr("Select all")),
                     ("escape", "clear_sel", tr("Clear selection")), ("f5", "send_all", tr("Re-send to keyboard")),
                     ("ctrl+r", "reload", tr("Reload")), ("f2", "setup", tr("Set up access")),
-                    ("ctrl+l", "language", tr("Language")), ("ctrl+q", "quit", tr("Quit"))]
+                    ("ctrl+l", "language", tr("Language")), ("ctrl+q", "quit", tr("Quit")),
+                    # Ctrl+C quits too (Textual only shows a hint); priority so text inputs don't take it as copy
+                    Binding("ctrl+c", "quit", tr("Quit"), show=False, priority=True)]
 
         def __init__(self):
             super().__init__()
