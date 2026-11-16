@@ -175,6 +175,16 @@ try:
 except ImportError:
     hid = None
 
+if hid is not None and sys.platform == "darwin":
+    # hidapi opens devices exclusively (seize) on macOS by default, which the system refuses for keyboards
+    # ("open failed" on the control interface even with Input Monitoring allowed). Non-exclusive also keeps
+    # the keyboard typing and lets the TUI, web UI and CLI share it. The wheel exports the C call, not a wrapper.
+    try:
+        import ctypes
+        ctypes.CDLL(hid.__file__).hid_darwin_set_open_exclusive(0)
+    except (OSError, AttributeError):
+        pass
+
 
 class RevenantError(RuntimeError):
     """keyboard not found / cannot be opened"""
