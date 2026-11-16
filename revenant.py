@@ -25,7 +25,7 @@ all traffic is 64-byte HID feature reports (report ID 0) on interface 1.
 Effect record (16 bytes):
   [id] [R] [G] [B] 00 00 00 00 [rainbow 0/1] [brightness 0-16] [speed 0-16] [dir] 00 00 aa 55
 """
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 
 import argparse, copy, importlib.util, json, os, subprocess, sys, threading, time
 from pathlib import Path
